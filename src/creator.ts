@@ -198,6 +198,7 @@ export class MSICreator {
       '{{ApplicationShortcutGuid}}': uuid(),
       '{{ApplicationShortName}}': this.shortName,
       '{{AppUserModelId}}': this.appUserModelId,
+      '{{DesktopShortcutGuid}}': uuid(),
       '{{Language}}': this.language.toString(10),
       '{{Manufacturer}}': this.manufacturer,
       '{{ShortcutFolderName}}': this.shortcutFolderName,
@@ -252,6 +253,9 @@ export class MSICreator {
 
     if (this.ui && !this.extensions.find((e) => e === 'WixUIExtension')) {
       this.extensions.push('WixUIExtension');
+    }
+    if (this.extensions.indexOf('WixUtilExtension') === -1) {
+      this.extensions.push('WixUtilExtension')
     }
 
     const preArgs = flatMap(this.extensions.map((e) => (['-ext', e])));

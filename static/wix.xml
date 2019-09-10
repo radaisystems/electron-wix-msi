@@ -17,6 +17,9 @@
              Platform="{{Platform}}"/>
     <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
 
+    <Property Id="WixSilentExecCmdLine" Value='"C:\Windows\System32\taskkill.exe" /F /IM Electron.exe /IM Rad_AI.exe' Hidden="yes"/>
+    <CustomAction Id="SilentExecClose" BinaryKey="WixCA" DllEntry="WixSilentExec" Execute="immediate" Return="ignore"/>
+
     <!-- Handle Updates -->
     <Upgrade Id="{{UpgradeCode}}">
       <UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND"
@@ -24,8 +27,11 @@
           Maximum="{{Version}}" IncludeMaximum="no" />
     </Upgrade>
 
+    <MajorUpgrade Schedule="afterInstallInitialize"
+          AllowDowngrades="yes" />
+
     <InstallExecuteSequence>
-      <RemoveExistingProducts After="InstallInitialize" />
+      <Custom Action="SilentExecClose" Before="InstallValidate"/>
     </InstallExecuteSequence>
 
 <!-- {{UI}} -->
@@ -36,6 +42,8 @@
       <Directory Id="{{ProgramFilesFolder}}">
 <!-- {{Directories}} -->
       </Directory>
+      <!-- Desktop -->
+      <Directory Id="DesktopFolder" Name="Desktop" />
       <!-- Start Menu -->
       <Directory Id="ProgramMenuFolder">
         <Directory Id="ApplicationProgramsFolder" Name="{{ShortcutFolderName}}"/>
@@ -62,10 +70,30 @@
       </Component>
     </DirectoryRef>
 
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="{{DesktopShortcutGuid}}" Win64='{{Win64YesNo}}'>
+        <Shortcut Id="DesktopShortcut"
+                  Name="{{ShortcutName}}"
+                  Description="{{ApplicationDescription}}"
+                  Target="[APPLICATIONROOTDIRECTORY]{{ApplicationBinary}}.exe"
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY">
+          <ShortcutProperty Key="System.AppUserModel.ID" Value="{{AppUserModelId}}" />
+        </Shortcut>
+        <RemoveFolder Id="DesktopFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU"
+                       Key="Software\Microsoft\{{ApplicationShortName}}"
+                       Name="installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
     <!-- Step 4: Tell WiX to install the files -->
     <Feature Id="MainApplication" Title="Main Application" Level="1">
 <!-- {{ComponentRefs}} -->
       <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
     </Feature>
   </Product>
 </Wix>
