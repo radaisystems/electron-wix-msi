@@ -1,3 +1,10 @@
+## Rad AI Notes
+- We've modified creator.ts & wix.xml.
+- We do an `npm build` and commit /lib so that it is ready to use.
+
+<br />
+<hr />
+
 ![electron-wix-msi](.github/logo.png)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/s54pty8rve3yemb9?svg=true)](https://ci.appveyor.com/project/felixrieseberg/electron-wix-msi)
